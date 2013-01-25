@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+* KNOLSKAPE SOLUTIONS Confidential
+*
+* Copyright 2012. All rights reserved.
+*
+* Author: Admin 
+* Project: FlexTraining
+* File name: FlexTraining.mxml
+* Creation Date: Jan 8, 2013
+-->
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%"
+			   creationComplete="application_creationCompleteHandler(event)" xmlns:customComponents="customComponents.*" xmlns:local="*" >
+	
+	<fx:Script>
+		<![CDATA[
+			import events.*;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.events.FlexEvent;
+			import mx.managers.BrowserManager;
+			import mx.managers.IBrowserManager;
+			import mx.managers.PopUpManager;
+			import mx.managers.ToolTipManager;
+			import mx.rpc.events.FaultEvent;
+			import mx.rpc.events.ResultEvent;
+			import mx.utils.object_proxy;
+			import mx.validators.*;
+			
+			import valueObjects.User;
+			
+			[Bindable] public var usersAC:ArrayCollection = new ArrayCollection();
+			[Bindable] public var emailContentAC:ArrayCollection = new ArrayCollection();
+			[Bindable] public var sentContentAC:ArrayCollection = new ArrayCollection();
+			[Bindable] private var nameOfUser:String;
+			[Bindable] public var username:String;
+			[Bindable] private var password:String;
+			[Bindable] private var address:String;
+			[Bindable] private var email:String;
+			[Bindable] private var mobile:String;
+			[Bindable] public var user:User;
+			
+			private var browserManager:IBrowserManager;
+			
+			protected function application_creationCompleteHandler(event:FlexEvent):void
+			{
+				browserManager = BrowserManager.getInstance();
+				browserManager.setTitle("BlueBuddy : P2P Social Network");
+				init();
+				var usersSending:XML=<data></data>;
+				//Alert.show(username);
+				usersSending.appendChild(<fields><uname>{username}</uname></fields>);
+				var obj:Object={};
+				obj.usersSending=usersSending;
+				users_service.send(obj);
+				Alert.show("Hello");
+				currentState="loginState";
+			}
+			
+			protected function registerButton_clickHandler(event:MouseEvent):void
+			{
+				currentState="formState";
+			}
+			
+			protected function formState_enterStateHandler(event:FlexEvent):void
+			{
+			}
+		
+			
+			protected function logoutButton_clickHandler(event:MouseEvent):void
+			{
+				currentState = "loginState";
+			}
+			
+			private function catchLogin(e:CatchLogin):void {
+				currentState = e.currentStateString;
+				username = loginComponent.username;
+				//this.logoutButton1.setStyle("icon","@Embed('./images/logout.png')");
+			}
+			
+			private function changeState(e:CatchLogin):void {
+			}
+			
+			protected function users_service_resultHandler(event:ResultEvent):void
+			{
+				usersAC.removeAll();
+				var resultXML:XML = XML(event.result);
+				var i:int;
+				for(i=0;i<resultXML.users.length();i++)
+				{
+					var dummyObj:Object = new Object();
+					dummyObj.name = resultXML.users[i].name;
+					dummyObj.email = resultXML.users[i].email;
+					dummyObj.username = resultXML.users[i].username;
+					dummyObj.mobile = resultXML.users[i].mobile;
+					usersAC.addItem(dummyObj);
+				}
+			}
+			
+			protected function users_service_faultHandler(event:FaultEvent):void
+			{
+				Alert.show("Getting users mis-fired!");
+			}
+			
+			protected function image1_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				currentState = "loginState";
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<s:RadioButtonGroup id="sexRG"/>
+		<mx:HTTPService
+			id="users_service"
+			result="users_service_resultHandler(event)"
+			fault="users_service_faultHandler(event)"
+			method="POST"
+			url="./php/users.php"
+			useProxy="false"
+			resultFormat="e4x">
+		</mx:HTTPService>
+	</fx:Declarations>
+	
+	<s:states>
+		<s:State name="loginState"/>
+		<s:State name="formState" enterState="formState_enterStateHandler(event)"/>
+		<s:State name="validateState"/>
+		<s:State name="loggedInState"/>
+		<s:State name="composeState"/>
+		<s:State name="inboxState"/>
+		<s:State name="sentState"/>
+	</s:states>	
+	
+	<s:layout>
+		<s:VerticalLayout horizontalAlign="center" verticalAlign="middle" >
+		</s:VerticalLayout>
+	</s:layout>
+	
+	<s:BorderContainer width="100%" height="100%" cornerRadius="10"	borderStyle="solid" borderWeight="4" backgroundImage="@Embed('./images/email.jpeg')">
+		<s:layout>
+			<s:HorizontalLayout paddingLeft="15" paddingRight="15" paddingTop="15" paddingBottom="15"/>
+		</s:layout>
+		<s:VGroup id="mainVG" width="100%" height="100%" horizontalAlign="center" verticalAlign="top">
+			<s:Label fontSize="32" fontWeight="bold" color="white" text="BlueBuddy:P2P Social Network"/>
+			<s:HGroup id="titleHG" width="35%" horizontalAlign="center" visible.validateState="false" verticalAlign="top">
+			</s:HGroup>
+			<!-- ............................................................................................... -->
+			<s:BorderContainer id="loginHG" width="100%" height="100%" cornerRadius="10" backgroundAlpha="0" borderStyle="solid" borderWeight="4" includeIn="loginState">
+				<s:layout>
+					<s:VerticalLayout verticalAlign="middle" horizontalAlign="center"/>
+				</s:layout>
+				<customComponents:loginComp width="100%" height="100%" id="loginComponent" catchLogin="catchLogin(event)"/>
+			</s:BorderContainer>
+			<!-- ............................................................... -->
+			<s:BorderContainer  cornerRadius="10" borderStyle="solid" borderWeight="4" includeIn="formState" >
+				<s:layout>
+					<s:HorizontalLayout horizontalAlign="center" verticalAlign="middle"/>
+				</s:layout>
+				<customComponents:registerForm width="100%" includeIn="formState" catchLogin="catchLogin(event)" />				
+			</s:BorderContainer>
+			<!-- ............................................................... -->
+			<s:VGroup id= "validateVG" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle" includeIn="validateState">
+			</s:VGroup>	
+			<!-- ............................................................... -->
+			<s:BorderContainer width="100%" height="100%" id="loggedInVG" includeIn= "loggedInState,inboxState,sentState,composeState">	
+				<s:HGroup id="firstLoggedIn" width="100%" height="100%" horizontalAlign="center" verticalAlign.sentState="top">
+					<s:BorderContainer width="15%" height="100%" id="leftVG" includeIn= "loggedInState,inboxState,sentState,composeState">
+						<s:layout>
+							<s:VerticalLayout horizontalAlign="center" verticalAlign="top"/>
+						</s:layout>
+						<customComponents:emailOptions catchLogin="catchLogin(event)" username="{username}" 
+													   usersAC="{usersAC}" emailContentAC="{emailContentAC}" 
+													   sentContentAC="{sentContentAC}">
+						</customComponents:emailOptions>
+					</s:BorderContainer>
+					<s:VGroup id="mainPanelInbox" width="85%" horizontalAlign="right">
+						<s:HGroup id="mainOptions" width="100%" includeIn="inboxState,sentState">
+							<s:Button id="delete" label="Delete" width="60" height="20"/>
+							<s:DropDownList includeIn="inboxState" width="60" height="20" labelField="Star" />
+							<s:BorderContainer width="100%" height="20" id="leftVG1" includeIn= "inboxState,sentState" borderAlpha="0" borderVisible="false">
+								<s:layout>
+									<s:HorizontalLayout horizontalAlign="right" verticalAlign="middle"/>
+								</s:layout>
+								<s:Label text="{username}" width="60" height="20"/>
+								<!--<s:Button id="logoutButton1" label="Logout" width="60" height="20" click="logoutButton_clickHandler(event)"  />-->
+								<s:Image buttonMode="true"	 click="image1_clickHandler(event)" source="@Embed('./images/logout.png')"
+										 toolTip="Logout of the simulation"/>
+							</s:BorderContainer>
+						</s:HGroup>
+						<s:DataGroup id="inboxDG" width="100%" dataProvider="{emailContentAC}" itemRenderer="itemRenderers.inboxIR" includeIn="inboxState">
+							<s:layout>
+								<s:VerticalLayout gap="0" horizontalAlign="center" verticalAlign="middle"/>
+							</s:layout>
+						</s:DataGroup>
+						<s:DataGroup id="sentDG" width="100%" dataProvider="{sentContentAC}" itemRenderer="sentIR" includeIn="sentState">
+							<s:layout>
+								<s:VerticalLayout gap="0" horizontalAlign="center" verticalAlign="middle"/>
+							</s:layout>
+						</s:DataGroup>
+						<s:BorderContainer width="100%" height="100%" includeIn="composeState" >
+							<s:layout>
+								<s:HorizontalLayout horizontalAlign="center" verticalAlign="middle"/>
+							</s:layout>
+							<customComponents:composeComponent width="100%" height="100%" username="{username}" catchLogin="catchLogin(event)">
+							</customComponents:composeComponent>
+						</s:BorderContainer>	
+					</s:VGroup>
+				</s:HGroup>
+			</s:BorderContainer>
+		</s:VGroup>
+	</s:BorderContainer>
+</s:Application>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--/*public function validationReturn1():void
+{
+}
+public function validationReturn():void
+{
+// if(email.text.length<1) return false;
+//if(validatorArr==null) return false; 
+
+//Alert.show("*****");
+var validatorErrorArray:Array = Validator.validateAll(validatorArr);
+//Alert.show("Done valid");
+if(validatorErrorArray.length == 0)
+{
+//Alert.show("Successful!");
+//	submitButton.enabled=true;
+//return true;
+temp = true;
+}
+else
+{
+temp = false;
+}
+}*/-->

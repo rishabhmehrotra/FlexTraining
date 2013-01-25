@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+* KNOLSKAPE SOLUTIONS Confidential
+*
+* Copyright 2012. All rights reserved.
+*
+* Author: Admin 
+* Project: FlexTraining
+* File name: LoginPage.mxml
+* Creation Date: Jan 9, 2013
+-->
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:ns1="*"
+			   width="100%" height="100%">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	
+	<s:VGroup id="mainVG" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
+		
+		<s:BorderContainer		
+			cornerRadius="10"
+			borderStyle="solid" borderWeight="4" >
+			<s:layout>
+				<s:HorizontalLayout 
+					paddingLeft="15" paddingRight="15" 
+					paddingTop="15" paddingBottom="15"/>
+			</s:layout>
+			<s:Label  fontSize="32" fontWeight="bold" text="BlueBuddy:P2P Social Network"/>
+		</s:BorderContainer>
+		
+		<s:HGroup id="mainHG" width="50%" height="100%" horizontalAlign="center" verticalAlign="middle">
+			<s:HGroup id="leftHG" width="35%" horizontalAlign="left">
+				<s:TextArea text="Welcome to BlueBuddy: a P2P Mobile Social Network. BlueBuddy provides you with the following additional features over any other services of its kind:&#xd;1)&#xd;2)&#xd;3)&#xd;4)&#xd;"/>	
+			</s:HGroup>
+			
+			<s:HGroup id="centerHG" width="30%" horizontalAlign="right">
+				<s:VideoDisplay/>	
+			</s:HGroup>
+			
+			<s:HGroup id="rightHG" width="35%" horizontalAlign="right">
+				
+				<s:VGroup id="rightVG" width="100%" verticalAlign="middle">
+					
+					<s:HGroup id="usernameHG" width="100%" horizontalAlign="left">
+						<s:HGroup id="usernameHG1" width="50%">	
+							<s:Label id="usernameLabel"     text="Username"/>
+						</s:HGroup>
+						
+						<s:HGroup id="usernameHG2" width="50%" horizontalAlign="right">	
+							<s:TextInput id="usernameTI"  />
+						</s:HGroup>
+					</s:HGroup>
+					
+					<s:HGroup id="passwordHG" width="100%" horizontalAlign="left">
+						<s:HGroup id="passwordHG1" width="50%">	
+							<s:Label id="passwordLabel"     text="Password"/>
+						</s:HGroup>
+						
+						<s:HGroup id="passwordHG2" width="50%" horizontalAlign="right">	
+							<s:TextInput id="passwordTI" displayAsPassword="true" />
+						</s:HGroup>
+					</s:HGroup>
+					<s:HGroup id="buttonHG" width="100%" horizontalAlign="center">
+						<s:Button id="registerButton" label="Register"/>
+						<s:Button id="loginButton" label="Login"/>
+					</s:HGroup>
+				</s:VGroup>
+			</s:HGroup>			
+		</s:HGroup>
+	</s:VGroup>
+</s:Application>

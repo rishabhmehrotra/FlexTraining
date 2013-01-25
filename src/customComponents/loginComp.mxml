@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%">
+	
+	<fx:Metadata>
+		[Event(name="catchLogin", type="events.CatchLogin")]
+	</fx:Metadata>
+	
+	<fx:Declarations>
+		
+		
+		
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<mx:HTTPService
+			id="login_user"
+			result="checkLogin(event)"
+			fault="login_user_faultHandler(event)"
+			method="POST"
+			url="./php/verifyUser.php"
+			useProxy="false"
+			resultFormat="e4x">
+		</mx:HTTPService>
+		
+		
+	</fx:Declarations>
+	
+	
+	<fx:Script>
+		<![CDATA[
+			
+			import events.*;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.events.FlexEvent;
+			import mx.rpc.events.FaultEvent;
+			import mx.rpc.events.ResultEvent;
+			import mx.utils.object_proxy;
+			import mx.validators.*;
+			
+			public var username:String;
+			public var password:String;
+			public var currentStateString:String;
+			public var currentStateString1:String;
+			[Bindable] public var usersAC:ArrayCollection = new ArrayCollection();
+			
+			
+			protected function loginButton_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				var sending:XML=<data></data>;
+				trace(usernameTI.text);
+				
+				username = usernameTI.text;
+				password = passwordTI.text;
+				sending.appendChild(<fields><uname>{usernameTI.text}</uname> 
+								<pwd>{passwordTI.text}</pwd></fields>);
+				var obj:Object={};
+				obj.sending=sending;
+				login_user.send(obj);
+			}
+			
+			protected function registerButton_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				//currentState="formState";
+				//init();
+				currentStateString1 = "formState";
+				dispatchEvent(new CatchLogin(currentStateString1));
+			}
+			
+			protected function checkLogin(event:ResultEvent):void
+			{
+				var resultXML:XML = XML(event.result);
+				//Alert.show(resultXML.toString());
+				//trace(resultXML);
+				if(resultXML.login == "yes")
+				{
+					//currentState = "loggedInState";
+					
+					var usersSending:XML=<data></data>;
+					//Alert.show(username);
+					usersSending.appendChild(<fields><uname>{username}</uname></fields>);
+					var obj:Object={};
+					obj.usersSending=usersSending;
+					//Alert.show(inboxSending);
+					//users_service.send(obj);
+					currentStateString = "loggedInState";
+					dispatchEvent(new CatchLogin(currentStateString));
+				}
+				if(resultXML.login == "no")
+					Alert.show("Invalid username/password");
+			}
+			
+			
+			protected function login_user_faultHandler(event:FaultEvent):void
+			{
+				// TODO Auto-geneated method stub
+				Alert.show("Danger");
+			}
+			
+			
+			
+		]]>
+	</fx:Script>
+	<s:VGroup width="100%" height="100%">
+		<!--		<s:HGroup horizontalAlign="left" verticalAlign="top">
+		-->			
+		
+		<s:BorderContainer backgroundColor="haloblue" backgroundAlpha="1" visible="false" >
+			<s:layout>
+				<s:HorizontalLayout verticalAlign="top" horizontalAlign="left"/>
+			</s:layout>
+			<s:HGroup id="leftHG"  verticalAlign="top" horizontalAlign="left">
+				<s:TextArea width="213" color="white" contentBackgroundAlpha="0.5" editable="false"
+							selectable="false" 
+							text="Welcome to BlueBuddy: a P2P Mobile Social Network.       BlueBuddy provides you with the following additional features over any other services of its kind:&#xd;1)&#xd;2)&#xd;3)&#xd;4)&#xd;"/>	
+			</s:HGroup>
+		</s:BorderContainer>
+		<!--</s:HGroup>-->
+		<s:HGroup width="100%" height="100%" horizontalAlign="right" paddingRight="60" paddingTop="-60"
+				  verticalAlign="top">
+			
+			<s:BorderContainer width="300" cornerRadius="10" borderStyle="inset" borderWeight="2" backgroundColor="haloblue" backgroundAlpha=".5">
+				<s:layout>
+					<s:VerticalLayout verticalAlign="middle" horizontalAlign="center"/>
+				</s:layout>
+				
+				<s:HGroup id="usernameHG" width="90%" horizontalAlign="left">	
+					<s:Label id="usernameLabel" text="Username" textAlign="left" width="40%"/>
+					<s:TextInput id="usernameTI" text="erishabh" width="80%" textAlign="center"/>
+				</s:HGroup>
+				
+				<s:HGroup id="passwordHG" width="90%" horizontalAlign="left">
+					<s:Label id="passwordLabel" text="Password" width="40%" textAlign="left"/>
+					<s:TextInput id="passwordTI" displayAsPassword="true" text="abc" textAlign="center" width="80%"/>
+				</s:HGroup>
+				<s:HGroup id="buttonHG" width="90%" horizontalAlign="center">
+					<s:Button id="registerButton" label="Register" click= "registerButton_clickHandler(event)" />
+					<s:Button id="loginButton" label="Login" click = "loginButton_clickHandler(event)" />
+				</s:HGroup>
+			</s:BorderContainer>
+			<!--<s:HGroup id="centerHG" width="30%" height="100%"  horizontalAlign="center" verticalAlign="middle">
+			<s:Image source="@Embed('./images/bluebuddy.png') "/>	
+			</s:HGroup>-->
+			
+			
+		</s:HGroup>
+	</s:VGroup>
+</s:Group>

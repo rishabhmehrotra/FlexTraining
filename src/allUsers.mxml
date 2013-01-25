@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:ItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				xmlns:s="library://ns.adobe.com/flex/spark" 
+				xmlns:mx="library://ns.adobe.com/flex/mx" 
+				autoDrawBackground="true">
+	
+	<s:BorderContainer width="150" height="20" borderVisible="false" backgroundColor="haloblue" backgroundAlpha="0.4">
+		<!--<s:Label text="{data}"/>-->
+		<s:layout>
+			<s:VerticalLayout horizontalAlign="left" verticalAlign="middle"/>
+			
+		</s:layout>
+		
+		
+				
+				<s:HGroup id="userHG" horizontalAlign="center" height="20" verticalAlign="middle" toolTip="{data.email}">
+					<s:Label id="sentToLabel" text="{data.name}"  />
+				
+		</s:HGroup>
+		
+	</s:BorderContainer>
+	
+	
+</s:ItemRenderer>

@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="400" height="300">
+	
+	<fx:Metadata>
+		[Event(name="catchLogin", type="events.CatchLogin")]
+	</fx:Metadata>
+	
+	
+	<fx:Script>
+		<![CDATA[
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.events.FlexEvent;
+			import mx.rpc.events.FaultEvent;
+			import mx.rpc.events.ResultEvent;
+			import mx.utils.object_proxy;
+			import mx.validators.*;
+			import events.*;
+			
+			[Bindable] public var emailContentAC:ArrayCollection = new ArrayCollection();
+			[Bindable] public var sentContentAC:ArrayCollection = new ArrayCollection();
+			[Bindable] public var usersAC:ArrayCollection = new ArrayCollection();
+
+			[Bindable] private var nameOfUser:String;
+			[Bindable] public var username:String;
+			[Bindable] private var password:String;
+			[Bindable] private var address:String;
+			[Bindable] private var email:String;
+			[Bindable] private var mobile:String;
+			
+			public var currentStateString:String;
+
+			
+			protected function inboxButton_clickHandler(event:MouseEvent):void
+			{
+				sentContentAC.removeAll();
+				emailContentAC.removeAll();
+				// TODO Auto-generated method stub
+				var inboxSending:XML=<data></data>;
+				//Alert.show(username);
+				inboxSending.appendChild(<fields><uname>{username}</uname></fields>);
+				var obj:Object={};
+				obj.inboxSending=inboxSending;
+				//Alert.show(inboxSending);
+				inbox_service.send(obj);
+				//currentState="inboxState";
+				currentStateString = "inboxState";
+				dispatchEvent(new CatchLogin(currentStateString));
+			}
+			
+			protected function sentButton_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				emailContentAC.removeAll();
+				sentContentAC.removeAll();
+				var sentSending:XML=<data></data>;
+				//Alert.show(username);
+				sentSending.appendChild(<fields><uname>{username}</uname></fields>);
+				var obj:Object={};
+				obj.sentSending=sentSending;
+				//Alert.show(inboxSending);
+				sent_service.send(obj);
+				//currentState="sentState";
+				currentStateString = "sentState";
+				dispatchEvent(new CatchLogin(currentStateString));
+			}
+			
+			protected function composeButton_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				//currentState="composeState";
+				currentStateString = "composeState";
+				dispatchEvent(new CatchLogin(currentStateString));
+			}
+			
+			protected function logoutButton_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				//currentState = "loginState";
+				currentStateString = "loginState";
+				dispatchEvent(new CatchLogin(currentStateString));
+			}
+			
+			protected function inbox_service_resultHandler(event:ResultEvent):void
+			{
+				// TODO Auto-generated method stub
+				//Alert.show("back to flex inbox");
+				var resultXML:XML = XML(event.result);
+				var i:int;
+				//Alert.show(resultXML);
+				//XMLList(resultXML.out.email).le
+				for(i=0;i<resultXML.email.length();i++)
+				{
+					var dummyObj:Object = new Object();
+					
+					dummyObj.name = resultXML.email[i].name;
+					dummyObj.username = resultXML.email[i].username;
+					dummyObj.subject = resultXML.email[i].subject;
+					dummyObj.content = resultXML.email[i].content;
+					dummyObj.from = resultXML.email[i].from;
+					//Alert.show(dummyObj.name);
+					emailContentAC.addItem(dummyObj);
+				}
+				//Alert.show(emailContentAC.toString());
+				//emailContentAC = data provider
+				//Alert.show(resultXML.toString());
+			}
+			
+			protected function inbox_service_faultHandler(event:FaultEvent):void
+			{
+				// TODO Auto-generated method stub
+				Alert.show("inbox mis-fired!");
+			}
+			
+			protected function sent_service_resultHandler(event:ResultEvent):void
+			{
+				// TODO Auto-generated method stub
+				var resultXML:XML = XML(event.result);
+				var i:int;
+				//Alert.show(resultXML);
+				//XMLList(resultXML.out.email).le
+				for(i=0;i<resultXML.email.length();i++)
+				{
+					var dummyObj:Object = new Object();
+					
+					dummyObj.name = resultXML.email[i].name;
+					dummyObj.username = resultXML.email[i].username;
+					dummyObj.subject = resultXML.email[i].subject;
+					dummyObj.sent_to = resultXML.email[i].sent_to;
+					dummyObj.content = resultXML.email[i].content;
+					//Alert.show(dummyObj.name);
+					sentContentAC.addItem(dummyObj);
+				}
+				//Alert.show(sentContentAC.toString());
+			}
+			
+			protected function sent_service_faultHandler(event:FaultEvent):void
+			{
+				// TODO Auto-generated method stub
+				Alert.show("sent mis-fired!");
+			}
+			
+		]]>
+	</fx:Script>
+	
+	
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<mx:HTTPService
+			id="inbox_service"
+			result="inbox_service_resultHandler(event)"
+			fault="inbox_service_faultHandler(event)"
+			method="POST"
+			url="./php/inbox.php"
+			useProxy="false"
+			resultFormat="e4x">
+		</mx:HTTPService>
+		
+		<mx:HTTPService
+			id="sent_service"
+			result="sent_service_resultHandler(event)"
+			fault="sent_service_faultHandler(event)"
+			method="POST"
+			url="./php/sent.php"
+			useProxy="false"
+			resultFormat="e4x">
+		</mx:HTTPService>
+	</fx:Declarations>
+	
+	<s:VGroup id="emailOptionsLeft" width="15%"  horizontalAlign="left">
+		<s:VGroup id="buttonsForEmail" width="100%" verticalAlign="middle" height="70%" >
+			<s:Button id="composeButton" width="150" height="20" label="Compose" click="composeButton_clickHandler(event)" />
+			<s:Button id="inboxButton" width="150" height="20" label="Inbox" click="inboxButton_clickHandler(event)" />
+			<s:Button id="sentButton" width="150" height="20" label="Sent" click="sentButton_clickHandler(event)" />
+			<s:Button id="logoutButton" label="Logout" width="150" height="20" click="logoutButton_clickHandler(event)" />
+		</s:VGroup>
+		
+		<!--<s:VGroup id="allUsers" width="85%" verticalAlign="top" height="20%">-->
+		<s:DataGroup id="usersDG"  width="150" height="100%" textAlign="justify" dataProvider="{usersAC}" itemRenderer="allUsers">
+			<s:layout>
+				<s:VerticalLayout gap="0" horizontalAlign="left" verticalAlign="middle"/>
+			</s:layout>
+		</s:DataGroup>
+		<!--</s:VGroup>-->
+	</s:VGroup>
+	
+</s:Group>

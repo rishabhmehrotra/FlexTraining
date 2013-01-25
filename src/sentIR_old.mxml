@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:ItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				xmlns:s="library://ns.adobe.com/flex/spark" 
+				xmlns:mx="library://ns.adobe.com/flex/mx" 
+				autoDrawBackground="true">
+	
+	
+	
+	<s:states>
+		<s:State name="subjectState">
+		</s:State>
+		
+		<s:State name="fullViewState">
+		</s:State>
+	</s:states>
+	
+	<s:BorderContainer width="100%" height="100%">
+		<!--<s:Label text="{data}"/>-->
+		<s:layout>
+			<s:VerticalLayout/>
+		</s:layout>
+		
+		
+		<s:HGroup id="subjectHG" width="100%" height="100%" includeIn="subjectState">
+			<s:HGroup id="individualMail" width="100%" height="100%">
+				
+				<s:HGroup id="checkBoxSelect" width="3%">
+					<s:CheckBox id="optionSelectCB"/>
+				</s:HGroup>
+				<s:HGroup id="checkBoxStar" width="3%">
+					<s:CheckBox id="optionStarCB"/>
+				</s:HGroup>
+				<s:HGroup id="checkBoxImportant" width="3%">
+					<s:CheckBox id="optionImportantCB"/>
+				</s:HGroup>
+				<s:HGroup id="senderHG" width="15%">
+					<s:Label id="sentToLabel" text="{data.sent_to}"/>
+				</s:HGroup>
+				<s:HGroup id="subjectHG2" width="40%">
+					<s:Label id="subjectLabel" text="{data.subject}"/>
+				</s:HGroup>
+				<s:HGroup id="startTextHG" width="25%">
+					<s:Label id="startTextLabel" text="{data.content}" maxDisplayedLines="0"/>
+				</s:HGroup>
+				<!--<s:HGroup id="dateHG" width="11%">
+				<s:Label id="dateLabel"/>
+				</s:HGroup>-->
+				
+			</s:HGroup>
+		</s:HGroup>
+		
+		<s:HGroup id="fullViewHG" width="100%" height="100%" includeIn="fullViewState">
+			<s:VGroup id="individualMailFV" width="100%" height="100%">
+				
+				<s:HGroup id="subjectHG1" width="100%" horizontalAlign="left">
+					<s:Label id="subjectLabel1"  text="{data.subject}"/>
+				</s:HGroup>
+				
+				<s:HGroup id="senderDetailsHG" width="100%">
+					
+					<s:HGroup id="senderNameHG" horizontalAlign="left" width="89%">
+						<s:Label id="senderLabel1"  text="{data.from}"/>
+					</s:HGroup>
+					
+					<s:HGroup id="fullViewMailOptionsHG" width="11%" horizontalAlign="right">
+						<s:HGroup id="replyHG" width="3%">
+							<s:RadioButton id="replyRB"/>
+						</s:HGroup>
+						<s:HGroup id="replyToAllHG" width="3%">
+							<s:RadioButton id="replyToAllRB"/>
+						</s:HGroup>
+						<s:HGroup id="forwardMailHG" width="3%">
+							<s:RadioButton id="forwardMailRB"/>
+						</s:HGroup>
+					</s:HGroup>
+					
+				</s:HGroup>
+				
+				<s:HGroup id="backToInboxHG" horizontalAlign="right" width="4%">
+					<s:Button id="backInboxButton" label="Inbox"/>
+				</s:HGroup>
+				
+			</s:VGroup>
+		</s:HGroup>
+		
+	</s:BorderContainer>
+	
+	
+</s:ItemRenderer>

@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="400" height="300">
+	
+	<fx:Metadata>
+		[Event(name="catchLogin", type="events.CatchLogin")]
+	</fx:Metadata>
+	
+	<fx:Script>
+		<![CDATA[
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.events.FlexEvent;
+			import mx.rpc.events.FaultEvent;
+			import mx.rpc.events.ResultEvent;
+			import mx.utils.object_proxy;
+			import mx.validators.*;
+			import events.*;
+			
+			[Bindable] public var temp:Boolean=true;
+			[Bindable] private var validatorArr:Array;
+			public var currentStateString:String;
+
+			
+			protected function backToLogin(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				//currentState="loginState";
+				currentStateString = "loginState";
+				dispatchEvent(new CatchLogin(currentStateString));
+			}
+			
+			protected function email_changeHandler(event:Event):void
+			{
+				// TODO Auto-generated method stub
+				validationReturn();
+			}
+			
+			private function init():void
+			{
+				trace("inside iunit");
+				validatorArr = new Array();
+				validatorArr.push(mobileValidator);
+				validatorArr.push(emailValidator);
+			}
+			
+			public function validationReturn1():void
+			{
+			}
+			public function validationReturn():void
+			{
+				// if(email.text.length<1) return false;
+				//if(validatorArr==null) return false; 
+				
+				//Alert.show("*****");
+				var validatorErrorArray:Array = Validator.validateAll(validatorArr);
+				//Alert.show("Done valid");
+				if(validatorErrorArray.length == 0)
+				{
+					//Alert.show("Successful!");
+					//	submitButton.enabled=true;
+					//return true;
+					temp = true;
+				}
+				else
+				{
+					temp = false;
+				}
+			}
+			
+			protected function submitButton_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				var registerSending:XML=<data></data>;
+				registerSending.appendChild(<fields>
+										<uname>{usernameString.text}</uname> 
+										<pwd>{passwordString.text}</pwd>
+										<name>{nameString.text}</name>
+										<address>{addressString.text}</address>
+										<email>{emailString.text}</email>
+										<mobile>{mobileString.text}</mobile>
+									</fields>);
+				var obj:Object={};
+				obj.registerSending=registerSending;
+				register_user.send(obj);
+			}
+			
+			protected function register_user_resultHandler(event:ResultEvent):void
+			{
+				// TODO Auto-generated method stub
+				var resultXML:XML = XML(event.result);
+				//Alert.show(resultXML.toString());
+				//trace(resultXML);
+				if(resultXML.success == "yes")
+				{
+					Alert.show("Congratulations! You have been registered successfully.");
+					//currentState="loginState";
+					currentStateString = "loginState";
+					dispatchEvent(new CatchLogin(currentStateString));
+				}
+				else if(resultXML.success == "no")
+				{
+					Alert.show("There was some error while registering you. Please try again.");
+					//currentState="formState";
+					currentStateString = "formState";
+					dispatchEvent(new CatchLogin(currentStateString));
+				}
+			}
+			
+			protected function register_user_faultHandler(event:FaultEvent):void
+			{
+				// TODO Auto-generated method stub
+				Alert.show("Register mis-fired!");
+			}
+			
+			
+		]]>
+	</fx:Script>
+	
+	
+	<fx:Declarations>
+		<mx:PhoneNumberValidator id="mobileValidator"  source = '{mobileString}' 
+								 property = 'text'/>
+		<mx:EmailValidator id="emailValidator" source = '{emailString}' 
+						   property = 'text'/>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<mx:HTTPService
+			id="register_user"
+			result="register_user_resultHandler(event)"
+			fault="register_user_faultHandler(event)"
+			method="POST"
+			url="./php/register.php"
+			useProxy="false"
+			resultFormat="e4x">
+		</mx:HTTPService>
+	</fx:Declarations>
+	<s:layout>
+		<s:VerticalLayout/>
+	</s:layout>
+	
+	<mx:Form width="100%">
+		<mx:FormHeading label="Welcome Aboard!"  width="100%" />
+		<mx:FormItem required="true" label="Name">
+			<mx:TextInput id="nameString" maxChars="96"  width="100%"  />
+		</mx:FormItem>
+		<mx:FormItem required="true" label="Username">
+			<mx:TextInput id="usernameString" maxChars="96" />
+		</mx:FormItem>
+		<mx:FormItem required="true" label="Password">
+			<mx:TextInput id="passwordString" maxChars="96" displayAsPassword="true" />
+		</mx:FormItem>
+		<mx:FormItem required="false" label="Address">
+			<mx:TextInput id="addressString" maxChars="128" />
+		</mx:FormItem>
+		<mx:FormItem required="true" label="Email" >
+			<mx:TextInput id="emailString" maxChars="128" change="{validationReturn1()}"/>
+		</mx:FormItem>
+		<mx:FormItem required="false" label="Mobile" >
+			<mx:TextInput id="mobileString" maxChars="10" restrict="0-9 \-" change="{validationReturn1()}" />
+		</mx:FormItem>
+		<mx:FormItem>
+			<mx:HBox>
+				<mx:Button label="Back" click="backToLogin(event)"/>
+				<mx:Button id="submitButton" label="Submit" enabled="true" click="submitButton_clickHandler(event)"/> <!-- click="validateForm(event)" -->
+			</mx:HBox>
+		</mx:FormItem>
+	</mx:Form>
+	
+</s:Group>
